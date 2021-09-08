@@ -87,7 +87,8 @@ RUN apk --no-cache add \
   zlib-dev \
   vips-dev \
   sqlite-dev \
-  cmake
+  cmake \
+  curl
 
 #
 # Packages
