@@ -1,4 +1,4 @@
-[![Travis branch](https://img.shields.io/travis/envygeeks/jekyll-docker/master.svg?style=for-the-badge)](https://travis-ci.org/envygeeks/jekyll-docker) [![Donate](https://img.shields.io/badge/DONATE-MONEY-yellow.svg?style=for-the-badge)](https://envygeeks.io#donate) [![Docker Stars](https://img.shields.io/docker/stars/jekyll/jekyll.svg?style=for-the-badge)]() [![Docker Pulls](https://img.shields.io/docker/pulls/jekyll/jekyll.svg?style=for-the-badge)]()
+[![Github Workflow Status](https://img.shields.io/github/workflow/status/envygeeks/jekyll-docker/Push?style=for-the-badge)](https://github.com/envygeeks/jekyll-docker/actions) [![Donate](https://img.shields.io/badge/DONATE-MONEY-yellow.svg?style=for-the-badge)](https://envygeeks.io#donate) [![Docker Stars](https://img.shields.io/docker/stars/jekyll/jekyll.svg?style=for-the-badge)]() [![Docker Pulls](https://img.shields.io/docker/pulls/jekyll/jekyll.svg?style=for-the-badge)]()
 
 # Jekyll Docker
 
@@ -19,11 +19,25 @@ The standard images (`jekyll/jekyll`) include a default set of "dev" packages, a
 ```sh
 export JEKYLL_VERSION=3.8
 docker run --rm \
-  --volume="$PWD:/srv/jekyll" \
+  --volume="$PWD:/srv/jekyll:Z" \
   -it jekyll/jekyll:$JEKYLL_VERSION \
   jekyll build
 ```
-
+#### Quick start under Windows (cmd)
+```cmd
+set site_name=my-blog
+docker run --rm --volume="%CD%:/srv/jekyll" -it jekyll/jekyll sh -c "chown -R jekyll /usr/gem/ && jekyll new %site_name%" && cd %site_name%
+```
+#### Quick start under Linux / Git Bash
+If you are under linux skip `export MSYS_NO_PATHCONV=1`. It is added for compatibility. You can check [here](https://github.com/docker-archive/toolbox/issues/673).
+```sh
+export site_name="my-blog" && export MSYS_NO_PATHCONV=1
+docker run --rm \
+  --volume="$PWD:/srv/jekyll" \
+  -it jekyll/jekyll \
+  sh -c "chown -R jekyll /usr/gem/ && jekyll new $site_name" \
+  && cd $site_name
+```
 ### Builder
 
 The builder image comes with extra stuff that is not included in the standard image, like `lftp`, `openssh` and other extra packages meant to be used by people who are deploying their Jekyll builds to another server with a CI.
@@ -33,7 +47,7 @@ The builder image comes with extra stuff that is not included in the standard im
 ```sh
 export JEKYLL_VERSION=3.8
 docker run --rm \
-  --volume="$PWD:/srv/jekyll" \
+  --volume="$PWD:/srv/jekyll:Z" \
   -it jekyll/builder:$JEKYLL_VERSION \
   jekyll build
 ```
@@ -49,9 +63,17 @@ The minimal image skips all the extra gems, all the extra dev dependencies and l
 ```sh
 export JEKYLL_VERSION=3.8
 docker run --rm \
-  --volume="$PWD:/srv/jekyll" \
+  --volume="$PWD:/srv/jekyll:Z" \
   -it jekyll/minimal:$JEKYLL_VERSION \
   jekyll build
+```
+
+#### Rootless Containers
+
+If you are using a rootless container management system, you can set the `JEKYLL_ROOTLESS` environment variable to any non-zero value. For example, you can use the following to initialize a new jekyll project in the current directory using [`podman`](https://podman.io/).
+
+```sh
+podman run -ti --rm -v .:/srv/jekyll -e JEKYLL_ROOTLESS=1 docker.io/jekyll/jekyll jekyll new .
 ```
 
 ## Server
@@ -62,7 +84,7 @@ For local development, Jekyll can be run in server mode inside the container. It
 
 ```sh
 docker run --rm \
-  --volume="$PWD:/srv/jekyll" \
+  --volume="$PWD:/srv/jekyll:Z" \
   --publish [::1]:4000:4000 \
   jekyll/jekyll \
   jekyll serve
@@ -78,7 +100,7 @@ If you provide a `Gemfile` and would like to update your `Gemfile.lock` you can 
 ```sh
 export JEKYLL_VERSION=3.8
 docker run --rm \
-  --volume="$PWD:/srv/jekyll" \
+  --volume="$PWD:/srv/jekyll:Z" \
   -it jekyll/jekyll:$JEKYLL_VERSION \
   bundle update
 ```
@@ -96,8 +118,8 @@ You can enable caching in Jekyll Docker by using a `docker --volume` that points
 ```sh
 export JEKYLL_VERSION=3.8
 docker run --rm \
-  --volume="$PWD:/srv/jekyll" \
-  --volume="$PWD/vendor/bundle:/usr/local/bundle" \
+  --volume="$PWD:/srv/jekyll:Z" \
+  --volume="$PWD/vendor/bundle:/usr/local/bundle:Z" \
   -it jekyll/jekyll:$JEKYLL_VERSION \
   jekyll build
 ```

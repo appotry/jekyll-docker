@@ -86,6 +86,7 @@ RUN apk --no-cache add \
   yaml-dev \
   zlib-dev \
   vips-dev \
+  vips-tools \
   sqlite-dev \
   cmake \
   curl
@@ -110,7 +111,7 @@ RUN apk --no-cache add \
   shadow \
   bash \
   su-exec \
-  nodejs-npm \
+  npm \
   libressl \
   yarn
 
@@ -169,6 +170,7 @@ RUN adduser  -Su 1000 -G \
     zlib-dev \
     libffi-dev \
     vips-dev \
+    vips-tools \
     cmake
 <% end %>
 
